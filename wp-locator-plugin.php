@@ -10,7 +10,7 @@
  * License: MIT
  */
 
-require_once 'includes/class-wp-locator-plugin.php';
+require_once __DIR__ . '/includes/class-wp-locator-plugin.php';
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
