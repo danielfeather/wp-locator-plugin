@@ -17,4 +17,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $plugin = new WP_Locator_Plugin();
-$plugin->init();
+$plugin->run();

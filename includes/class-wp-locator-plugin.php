@@ -6,62 +6,61 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class WP_Locator_Plugin {
 
-    public function init(){
+    protected $name = 'wp-locator-plugin';
 
-        $this->register_post_type();
-        $this->register_admin();
+    /**
+     * @var WP_Locator_Plugin_Loader
+     */
+    protected $loader;
 
+    public function __construct()
+    {
+        $this->load_dependancies();
+
+        $this->loader->add_action('init', $this, 'register_post_type');
+        $this->loader->add_filter('manage_location_posts_columns', $this, 'register_post_type_columns');
+        $this->loader->add_action('admin_menu', new WP_Locator_Plugin_Admin(), 'register_admin_menus');
     }
 
-    public function register_admin(){
-
-        add_action('admin_menu', function (){
-            add_menu_page(
-                'WP Locator', // visible page name
-                'WP Locator', // menu label
-                'edit_posts', // required capability
-                'wp-locator-admin', // hook/slug of page
-                [$this, 'load_home_page'], // function to render the page
-                'dashicons-location-alt' // custom icon
-            );
-        });
-
+    public function run(){
+        $this->loader->run();
     }
 
-    // Loads the HTML for the main WP Locator page.
-    public function load_home_page(){
+    public function load_dependancies(){
 
-        require __DIR__ . '/admin/views/html-admin-page-home.php';
+        require_once plugin_dir_path(__FILE__) . '/class-wp-locator-plugin-loader.php';
+
+        require_once plugin_dir_path(__FILE__) . '/../admin/class-wp-locator-plugin-admin.php';
+
+        $this->loader = new WP_Locator_Plugin_Loader();
 
     }
 
     public function register_post_type(){
 
-        add_action('init', function (){
+        register_post_type('location', [
+            'labels' => [
+                'name' => __('Locations', 'wp-locator-plugin'),
+                'singular_name' => __('Location', 'wp-locator-plugin'),
+            ],
+            'description' => 'An individual location',
+            'public' => true,
+            'menu_icon' => 'dashicons-location',
+            'show_in_rest' => true
+        ]);
 
-            register_post_type('location', [
-                'labels' => [
-                    'name' => __('Locations', 'wp-locator-plugin'),
-                    'singular_name' => __('Location', 'wp-locator-plugin'),
-                ],
-                'description' => 'An individual location',
-                'public' => true,
-                'menu_icon' => 'dashicons-location',
-                'show_in_rest' => true
-            ]);
+    }
 
-        });
+    public function register_post_type_columns($columns)
+    {
 
-        add_filter('manage_location_posts_columns', static function ($columns){
+        unset($columns['date']);
 
-            unset($columns['date']);
+        $columns['updated_at'] = __('Date Updated', 'wp-locator-plugin');
+        $columns['Created At'] = __('Date Created', 'wp-locator-plugin');
 
-            $columns['updated_at'] = __('Date Updated', 'wp-locator-plugin');
-            $columns['Created At'] = __('Date Created', 'wp-locator-plugin');
+        return $columns;
 
-            return $columns;
-
-        });
     }
 
 }
