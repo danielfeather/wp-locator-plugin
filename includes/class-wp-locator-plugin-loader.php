@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 class WP_Locator_Plugin_Loader {
 
     protected $filters = [];
