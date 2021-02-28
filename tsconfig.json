@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "module": "commonjs",
+    "noImplicitAny": true,
+    "resolveJsonModule": true,
+    "target": "es2019",
+    "sourceMap": true
+  },
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}
