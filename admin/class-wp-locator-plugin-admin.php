@@ -2,6 +2,17 @@
 
 class WP_Locator_Plugin_Admin {
 
+    /**
+     * @var WP_Locator_Plugin
+     */
+    protected $plugin;
+
+    public function __construct($plugin)
+    {
+        $this->plugin = $plugin;
+    }
+
+
     public function register_settings()
     {
 
@@ -74,7 +85,7 @@ class WP_Locator_Plugin_Admin {
     // Loads the HTML for the main WP Locator page.
     public function load_home_page()
     {
-
+        $authorization_url = $this->plugin->oauth->get_authorization_url();
         require plugin_dir_path(__FILE__) . '/views/html-admin-page-home.php';
 
     }

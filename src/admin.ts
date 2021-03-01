@@ -7,7 +7,6 @@ const client_secret_input = document.getElementById('wp-locator-oauth-client-sec
 dcr_checkbox.addEventListener('change', function(event) {
 
     if (this.checked){
-        console.log('this is not checked');
         client_id_input.disabled = true;
         client_secret_input.disabled = true;
         return;
@@ -16,4 +15,4 @@ dcr_checkbox.addEventListener('change', function(event) {
     client_id_input.disabled = false;
     client_secret_input.disabled = false;
 
-})
+});

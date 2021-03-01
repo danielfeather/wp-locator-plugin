@@ -18,6 +18,16 @@ class WP_Locator_Plugin {
      */
     protected $admin;
 
+    /**
+     * @var WP_Locator_DCR_Client
+     */
+    protected $dcr;
+
+    /**
+     * @var WP_Locator_OAuth_Client
+     */
+    public $oauth;
+
     public function __construct()
     {
         $this->load_dependancies();
@@ -29,6 +39,8 @@ class WP_Locator_Plugin {
         $this->loader->add_action('admin_notices', $this->admin, 'show_admin_notices');
         $this->loader->add_action('admin_init', $this->admin, 'register_settings');
         $this->loader->add_action('admin_enqueue_scripts', $this->admin, 'load_scripts');
+
+        $this->loader->add_action('admin_post_wp_locator_register_client', $this->dcr, 'register');
         $this->loader->add_action('template_redirect', $this, 'validate_auth_code');
 
         $this->loader->add_filter('query_vars', $this, 'register_query_vars');
@@ -45,10 +57,17 @@ class WP_Locator_Plugin {
 
         require_once plugin_dir_path(__FILE__) . '/../admin/class-wp-locator-plugin-admin.php';
 
+        require_once plugin_dir_path(__FILE__) . '/class-wp-locator-dcr-client.php';
+
+        require_once plugin_dir_path(__FILE__) . '/class-wp-locator-oauth-client.php';
+
         $this->loader = new WP_Locator_Plugin_Loader();
 
-        $this->admin = new WP_Locator_Plugin_Admin();
+        $this->dcr = new WP_Locator_DCR_Client();
 
+        $this->oauth = new WP_Locator_OAuth_Client();
+
+        $this->admin = new WP_Locator_Plugin_Admin($this);
     }
 
     public function register_post_type()
@@ -102,27 +121,29 @@ class WP_Locator_Plugin {
 
         if (!empty($authorization_code)){
 
-            $response = wp_remote_post('https://yourauth0domain/oauth/token', [
+            $response = wp_remote_post(rtrim(get_option(WP_LOCATOR_OAUTH_AUTHORITY), '/') . '/oauth/token', [
                 'body' => [
-                    'client_id' => '',
-                    'client_secret' => '',
+                    'client_id' => get_option(WP_LOCATOR_OAUTH_CLIENT_ID),
+                    'client_secret' => get_option(WP_LOCATOR_OAUTH_CLIENT_SECRET),
                     'grant_type' => 'authorization_code',
                     'code' => $authorization_code,
-                    'redirect_uri' => 'http://WP_HOST/wp-locator/oauth2/callback'
+                    'redirect_uri' => rtrim(site_url(), '/') . '/wp-locator/oauth2/callback'
                 ]
             ]);
 
             $body = json_decode(wp_remote_retrieve_body($response));
 
-            $api_response = wp_remote_get('http://API_HOST:PORT/api/v1/locations', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $body->access_token
-                ]
-            ]);
+            wp_send_json($body);
 
-            $api_response_body = json_decode(wp_remote_retrieve_body($api_response));
-
-            wp_send_json($api_response_body);
+//            $api_response = wp_remote_get(rtrim(get_option(WP_LOCATOR_API_ENDPOINT),'/') . '/api/v1/locations', [
+//                'headers' => [
+//                    'Authorization' => 'Bearer ' . $body->access_token
+//                ]
+//            ]);
+//
+//            $api_response_body = json_decode(wp_remote_retrieve_body($api_response));
+//
+//            wp_send_json($api_response_body);
 
         }
 
