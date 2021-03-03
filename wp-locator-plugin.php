@@ -18,6 +18,10 @@ define('WP_LOCATOR_OAUTH_USE_DCR', 'wp-locator-oauth-use-dcr');
 define('WP_LOCATOR_OAUTH_DCR_ENDPOINT', 'wp-locator-oauth-dcr-endpoint');
 define('WP_LOCATOR_OAUTH_CLIENT_ID', 'wp-locator-oauth-client-id');
 define('WP_LOCATOR_OAUTH_CLIENT_SECRET', 'wp-locator-oauth-client-secret');
+define('WP_LOCATOR_OAUTH_REFRESH_TOKEN', 'wp-locator-oauth-refresh-token');
+
+// The access token will be stored in a Wordpress Transient.
+define('WP_LOCATOR_OAUTH_ACCESS_TOKEN', 'wp-locator-oauth-access-token');
 
 require_once __DIR__ . '/includes/class-wp-locator-plugin.php';
 
