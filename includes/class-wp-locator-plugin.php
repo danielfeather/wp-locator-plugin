@@ -28,6 +28,11 @@ class WP_Locator_Plugin {
      */
     public $oauth;
 
+    /**
+     * @var WP_Locator_Import_Service
+     */
+    protected $import_service;
+
     public function __construct()
     {
         $this->load_dependancies();
@@ -45,6 +50,9 @@ class WP_Locator_Plugin {
 
         $this->loader->add_filter('query_vars', $this, 'register_query_vars');
 
+        $this->register_cron_schedules();
+        $this->register_cron_actions();
+
     }
 
     public function run(){
@@ -61,6 +69,10 @@ class WP_Locator_Plugin {
 
         require_once plugin_dir_path(__FILE__) . '/class-wp-locator-oauth-client.php';
 
+        require_once plugin_dir_path(__FILE__) . '/class-wp-locator-api-client.php';
+
+        require_once plugin_dir_path(__FILE__) . '/class-wp-locator-import-service.php';
+
         $this->loader = new WP_Locator_Plugin_Loader();
 
         $this->dcr = new WP_Locator_DCR_Client();
@@ -68,6 +80,8 @@ class WP_Locator_Plugin {
         $this->oauth = new WP_Locator_OAuth_Client();
 
         $this->admin = new WP_Locator_Plugin_Admin($this);
+
+        $this->import_service = new WP_Locator_Import_Service();
     }
 
     public function register_post_type()
@@ -109,6 +123,26 @@ class WP_Locator_Plugin {
 
         add_rewrite_rule('^wp-locator/oauth2/callback', 'index.php', 'top');
 
+    }
+
+    public function register_cron_actions()
+    {
+        $this->loader->add_action('wp_locator_import_service', $this->import_service, 'run');
+    }
+
+    public function register_cron_schedules()
+    {
+        $this->loader->add_filter('cron_schedules', $this, 'cron_schedules');
+    }
+
+    public function cron_schedules($schedules)
+    {
+        $schedules['fifteen_minutes'] = [
+            'interval' => 900,
+            'display' => esc_html__('Every Fifteen Minutes')
+        ];
+
+        return $schedules;
     }
 
     public function validate_auth_code()

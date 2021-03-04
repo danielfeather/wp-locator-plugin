@@ -11,7 +11,7 @@
  */
 
 
-define('WP_LOCATOR_API_ENDPOINT', 'wp-locator-api-endpoint');
+define('WP_LOCATOR_API_BASE_URL', 'wp-locator-api-base-url');
 
 define('WP_LOCATOR_OAUTH_AUTHORITY', 'wp-locator-oauth-authority');
 define('WP_LOCATOR_OAUTH_USE_DCR', 'wp-locator-oauth-use-dcr');
@@ -23,11 +23,20 @@ define('WP_LOCATOR_OAUTH_REFRESH_TOKEN', 'wp-locator-oauth-refresh-token');
 // The access token will be stored in a Wordpress Transient.
 define('WP_LOCATOR_OAUTH_ACCESS_TOKEN', 'wp-locator-oauth-access-token');
 
-require_once __DIR__ . '/includes/class-wp-locator-plugin.php';
+require_once plugin_dir_path(__FILE__) . '/includes/class-wp-locator-activator.php';
+require_once plugin_dir_path(__FILE__) . '/includes/class-wp-locator-deactivator.php';
+
+$activator = new WP_Locator_Activator();
+$deactivator = new WP_Locator_Deactivator();
+
+require_once plugin_dir_path(__FILE__) . '/includes/class-wp-locator-plugin.php';
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
+
+register_activation_hook(__FILE__, [$activator, 'activate']);
+register_deactivation_hook(__FILE__, [$deactivator, 'deactivate']);
 
 $plugin = new WP_Locator_Plugin();
 $plugin->run();

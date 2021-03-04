@@ -19,12 +19,12 @@ class WP_Locator_Plugin_Admin {
         // API Settings
         add_settings_section('wp-locator-api-settings', null, null, 'wp-locator-api-settings');
 
-        add_settings_field(WP_LOCATOR_API_ENDPOINT, 'API Endpoint', static function(){
-            $value = get_option(WP_LOCATOR_API_ENDPOINT);
-            echo "<input name=\"" . WP_LOCATOR_API_ENDPOINT . "\" type=\"text\" value=\"$value\">";
+        add_settings_field(WP_LOCATOR_API_BASE_URL, 'API Base URL', static function(){
+            $value = get_option(WP_LOCATOR_API_BASE_URL);
+            echo "<input name=\"" . WP_LOCATOR_API_BASE_URL . "\" type=\"text\" value=\"$value\">";
         }, 'wp-locator-api-settings', 'wp-locator-api-settings');
 
-        register_setting('wp-locator-api-settings', 'wp-locator-api-endpoint');
+        register_setting('wp-locator-api-settings', WP_LOCATOR_API_BASE_URL);
 
         // OAuth Settings
         add_settings_section('wp-locator-oauth-settings', null, null, 'wp-locator-oauth-settings');
