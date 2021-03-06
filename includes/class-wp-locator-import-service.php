@@ -71,7 +71,7 @@ class WP_Locator_Import_Service extends WP_Locator_Api_Client {
         $locations = $this->do_api_get('/locations');
 
         if (!is_array($locations)){
-            echo 'Unexpected Response';
+            echo 'Unexpected Response' . PHP_EOL;
             return;
         }
 

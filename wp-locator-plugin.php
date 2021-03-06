@@ -35,8 +35,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-register_activation_hook(__FILE__, [$activator, 'activate']);
-register_deactivation_hook(__FILE__, [$deactivator, 'deactivate']);
-
 $plugin = new WP_Locator_Plugin();
 $plugin->run();
+
+register_activation_hook(__FILE__, [$activator, 'activate']);
+register_deactivation_hook(__FILE__, [$deactivator, 'deactivate']);

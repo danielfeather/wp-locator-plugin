@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 class WP_Locator_Plugin_Admin {
 
     /**
@@ -133,4 +137,44 @@ class WP_Locator_Plugin_Admin {
 
     }
 
+    public function register_meta()
+    {
+        $meta = [
+            '_wp_locator_id' => 'id',
+            '_wp_locator_name' => 'name',
+            '_wp_locator_display_name' => 'display_name',
+            '_wp_locator_location' => 'location',
+            '_wp_locator_opening_hours' => 'opening_hours',
+            '_wp_locator_contact_details' => 'contact_details',
+            '_wp_locator_created_at' => 'created_at',
+            '_wp_locator_updated_at' => 'updated_at'
+        ];
+
+        foreach ($meta as $key){
+            register_meta('post', $key, [
+                'object_subtype' => 'location'
+            ]);
+        }
+    }
+
+    public function add_meta_boxes()
+    {
+        add_meta_box('wp-locator-plugin', 'Location Attributes', [$this, 'meta_box_html'], 'location');
+    }
+
+    public function meta_box_html()
+    {
+        $fields = [
+            '_wp_locator_id' => 'id',
+            '_wp_locator_name' => 'name',
+            '_wp_locator_display_name' => 'display_name',
+            '_wp_locator_location' => 'location',
+            '_wp_locator_opening_hours' => 'opening_hours',
+            '_wp_locator_contact_details' => 'contact_details',
+            '_wp_locator_created_at' => 'created_at',
+            '_wp_locator_updated_at' => 'updated_at'
+        ];
+        $location_id = get_the_ID();
+        require plugin_dir_path(__FILE__) . '/views/html-admin-location-meta-box.php';
+    }
 }

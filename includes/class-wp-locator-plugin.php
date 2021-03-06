@@ -52,6 +52,10 @@ class WP_Locator_Plugin {
 
         $this->loader->add_filter('query_vars', $this, 'register_query_vars');
 
+        $this->admin->register_meta();
+
+        $this->loader->add_action('add_meta_boxes', $this->admin, 'add_meta_boxes');
+
         $this->register_cron_schedules();
         $this->register_cron_actions();
 
@@ -95,6 +99,7 @@ class WP_Locator_Plugin {
                 'singular_name' => __('Location', 'wp-locator-plugin'),
             ],
             'description' => 'An individual location',
+            'has_archive' => true,
             'public' => true,
             'menu_icon' => 'dashicons-location',
             'show_in_rest' => true
