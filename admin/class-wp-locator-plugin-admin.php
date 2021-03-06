@@ -86,6 +86,48 @@ class WP_Locator_Plugin_Admin {
         }
     }
 
+    public function validate_auth_code()
+    {
+        if (!isset($_GET['page'])){
+            return;
+        }
+
+        if ($_GET['page'] !== 'wp-locator-admin'){
+            return;
+        }
+
+        if (!isset($_GET['code'], $_GET['state'])){
+            return;
+        }
+
+        $authorization_code = sanitize_text_field($_GET['code']);
+        $client_state = sanitize_text_field($_GET['state']);
+
+        if (empty($authorization_code) || empty($client_state)){
+            return;
+        }
+
+        if (!wp_verify_nonce($client_state)){
+            return;
+        }
+
+        $response = wp_remote_post(rtrim(get_option(WP_LOCATOR_OAUTH_AUTHORITY), '/') . '/oauth/token', [
+            'body' => [
+                'client_id' => get_option(WP_LOCATOR_OAUTH_CLIENT_ID),
+                'client_secret' => get_option(WP_LOCATOR_OAUTH_CLIENT_SECRET),
+                'grant_type' => 'authorization_code',
+                'code' => $authorization_code,
+                'redirect_uri' => rtrim(admin_url(), '/') . '/admin.php?page=wp-locator-admin'
+            ]
+        ]);
+
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+
+        update_option(WP_LOCATOR_OAUTH_REFRESH_TOKEN, $body['refresh_token']);
+        set_transient(WP_LOCATOR_OAUTH_ACCESS_TOKEN, $body['access_token'], 3600);
+
+    }
+
     // Loads the HTML for the main WP Locator page.
     public function load_home_page()
     {
@@ -96,15 +138,95 @@ class WP_Locator_Plugin_Admin {
 
     public function show_admin_notices()
     {
-        if (empty(get_option(WP_LOCATOR_OAUTH_CLIENT_ID))){
-
-            echo '
+        if (!$this->has_client_credentials()){
+            ?>
                 <div class="notice notice-warning">
-                    <p>WP Locator: No client credentials have been set, please register with WP Locator. <a href="" class="button">Register</a></p>
+                    <p>
+                        WP Locator: Missing client credentials, please register for client credentials or enter them on the WP Locator Admin page.</p>
+                        <form action="<?= admin_url('admin-post.php')?>" method="post">
+                            <input type="hidden" name="action" value="wp_locator_dcr_register">
+                            <button type="submit" class="button-primary" <?php echo !$this->is_dcr_enabled() ? 'disabled' : null ?>>Register</button>
+                        </form>
+                        <a href="<?php menu_page_url('wp-locator-admin') ?>" class="button">Enter Credentials</a>
+                    </p>
                 </div>
-            ';
+            <?php
+        }
+    }
+
+    /**
+     * Checks if the client credentials have been set in the WP Options table.
+     * Returns false if there is a problem and the user needs to register or re-register the client.
+     * @return bool
+     */
+    protected function has_client_credentials(){
+
+        if (empty(get_option(WP_LOCATOR_OAUTH_CLIENT_ID)) || empty(get_option(WP_LOCATOR_OAUTH_CLIENT_SECRET))){
+
+            return false;
 
         }
+
+        return true;
+    }
+
+    public function is_dcr_enabled()
+    {
+
+        $isEnabled = get_option(WP_LOCATOR_OAUTH_USE_DCR);
+
+        if (!is_numeric($isEnabled)){
+            return false;
+        }
+
+        if (!$isEnabled){
+            return false;
+        }
+
+        return true;
+    }
+
+    public function has_refresh_token()
+    {
+        $refresh_token = get_option(WP_LOCATOR_OAUTH_REFRESH_TOKEN);
+
+        if (!$refresh_token){
+            return false;
+        }
+
+        return true;
+    }
+
+    public function get_status()
+    {
+        if (!$this->has_client_credentials()){
+            return 'disconnected';
+        }
+
+        if (!$this->has_refresh_token()){
+            return 'disconnected';
+        }
+
+        return 'connected';
+    }
+
+    public function render_status()
+    {
+        $status = $this->get_status();
+        $status_text = $status === 'connected' ? 'Connected' : 'Disconnected';
+        $status_color = $status === 'connected' ? 'green-500' : 'red-500';
+        ?>
+            <div class="mr-auto block flex items-center">
+                <div class="relative h-6 w-6 mr-4">
+                    <span class="animate-ping-discrete absolute h-full w-full bg-<?= $status_color ?> opacity-75 rounded-full"></span>
+                    <span class="block rounded-full bg-<?= $status_color ?> h-full w-full"></span>
+                </div>
+                <div class="">
+                    <span class="text-<?= $status_color ?> font-bold text-lg block"><?= $status_text ?></span>
+                    <small class="block text-xs">Last Sync: Never</small>
+                </div>
+            </div>
+        <?php
     }
 
     public function register_post_type_columns($columns)

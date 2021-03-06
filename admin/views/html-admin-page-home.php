@@ -15,17 +15,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
     <div class="px-10 mb-8">
         <div class="bg-white p-4 flex">
-            <div class="mr-auto block flex items-center">
-                <div class="relative h-6 w-6 mr-4">
-                    <span class="animate-ping-discrete absolute h-full w-full bg-green-500 opacity-75 rounded-full"></span>
-                    <span class="block rounded-full bg-green-500 h-full w-full"></span>
-                </div>
-                <div class="">
-                    <span class="text-green-500 font-bold text-lg block">Healthy</span>
-                    <small class="block text-xs">Last Sync: Never</small>
-                </div>
+            <?php $this->render_status(); ?>
+            <div class="flex items-center">
+                <?php if ($this->get_status() !== 'connected'): ?>
+                    <a href="<?php echo $authorization_url ?>" class="inline-block bg-green-500 hover:bg-green-600 focus:bg-green-600 px-4 py-2 font-bold text-white">Connect</a>
+                <?php else: ?>
+                    <a href="<?php echo $authorization_url ?>" class="inline-block bg-red-500 hover:bg-red-600 focus:bg-red-600 px-4 py-2 font-bold text-white">Disconnect</a>
+                <?php endif; ?>
             </div>
-            <a href="<?php echo $authorization_url ?>" class="button button-primary">Authorize</a>
         </div>
     </div>
 
@@ -50,11 +47,6 @@ if ( ! defined( 'ABSPATH' ) ) {
                 do_settings_sections('wp-locator-oauth-settings');
                 submit_button();
                 ?>
-            </form>
-
-            <form action="admin-post.php" method="post">
-                <input type="hidden" name="action" value="wp_locator_register_client">
-                <input type="submit" value="Submit">
             </form>
         </div>
     </div>

@@ -25,13 +25,14 @@ class WP_Locator_OAuth_Client {
         $this->access_token = get_transient(WP_LOCATOR_OAUTH_ACCESS_TOKEN);
         $this->audience = 'http://localhost:3000/';
         $this->scope = 'Locations.Read offline_access';
-        $this->redirect_uri = rtrim(site_url(), '/') . '/wp-locator/oauth2/callback';
+        $this->redirect_uri = rtrim(admin_url(), '/') . '/admin.php?page=wp-locator-admin';
         $this->token_expiration = 3600;
     }
 
     public function get_authorization_url()
     {
-        return rtrim($this->authority, '/') . "/authorize?client_id=$this->client_id&audience=$this->audience&scope=$this->scope&state=testing123&response_type=code&redirect_uri=$this->redirect_uri";
+        $nonce = wp_create_nonce();
+        return rtrim($this->authority, '/') . "/authorize?client_id=$this->client_id&audience=$this->audience&scope=$this->scope&state=$nonce&response_type=code&redirect_uri=$this->redirect_uri";
     }
 
     public function get_access_token()

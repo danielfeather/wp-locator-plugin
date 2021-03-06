@@ -47,7 +47,6 @@ class WP_Locator_Plugin {
         $this->loader->add_action('admin_enqueue_scripts', $this->admin, 'load_scripts');
         $this->loader->add_action('manage_location_posts_custom_column', $this->admin, 'custom_location_columns', 10, 2);
 
-        $this->loader->add_action('admin_post_wp_locator_register_client', $this->dcr, 'register');
         $this->loader->add_action('template_redirect', $this, 'validate_auth_code');
 
         $this->loader->add_filter('query_vars', $this, 'register_query_vars');
@@ -55,6 +54,9 @@ class WP_Locator_Plugin {
         $this->admin->register_meta();
 
         $this->loader->add_action('add_meta_boxes', $this->admin, 'add_meta_boxes');
+        $this->loader->add_action('admin_post_wp_locator_dcr_register', $this->dcr, 'register');
+
+        $this->loader->add_action('admin_init', $this->admin, 'validate_auth_code');
 
         $this->register_cron_schedules();
         $this->register_cron_actions();
@@ -138,44 +140,6 @@ class WP_Locator_Plugin {
         ];
 
         return $schedules;
-    }
-
-    public function validate_auth_code()
-    {
-
-        global $wp_query;
-
-        $authorization_code = $wp_query->get('code');
-        $client_state = $wp_query->get('state');
-
-        if (!empty($authorization_code)){
-
-            $response = wp_remote_post(rtrim(get_option(WP_LOCATOR_OAUTH_AUTHORITY), '/') . '/oauth/token', [
-                'body' => [
-                    'client_id' => get_option(WP_LOCATOR_OAUTH_CLIENT_ID),
-                    'client_secret' => get_option(WP_LOCATOR_OAUTH_CLIENT_SECRET),
-                    'grant_type' => 'authorization_code',
-                    'code' => $authorization_code,
-                    'redirect_uri' => rtrim(site_url(), '/') . '/wp-locator/oauth2/callback'
-                ]
-            ]);
-
-            $body = json_decode(wp_remote_retrieve_body($response));
-
-            wp_send_json($body);
-
-//            $api_response = wp_remote_get(rtrim(get_option(WP_LOCATOR_API_ENDPOINT),'/') . '/api/v1/locations', [
-//                'headers' => [
-//                    'Authorization' => 'Bearer ' . $body->access_token
-//                ]
-//            ]);
-//
-//            $api_response_body = json_decode(wp_remote_retrieve_body($api_response));
-//
-//            wp_send_json($api_response_body);
-
-        }
-
     }
 
 }
