@@ -39,11 +39,13 @@ class WP_Locator_Plugin {
 
         $this->loader->add_action('init', $this, 'register_post_type');
         $this->loader->add_action('init', $this, 'add_auth_callback_rule');
-        $this->loader->add_filter('manage_location_posts_columns', $this, 'register_post_type_columns');
+
         $this->loader->add_action('admin_menu', $this->admin, 'register_admin_menus');
-        $this->loader->add_action('admin_notices', $this->admin, 'show_admin_notices');
         $this->loader->add_action('admin_init', $this->admin, 'register_settings');
+        $this->loader->add_action('admin_notices', $this->admin, 'show_admin_notices');
+        $this->loader->add_filter('manage_location_posts_columns', $this->admin, 'register_post_type_columns');
         $this->loader->add_action('admin_enqueue_scripts', $this->admin, 'load_scripts');
+        $this->loader->add_action('manage_location_posts_custom_column', $this->admin, 'custom_location_columns', 10, 2);
 
         $this->loader->add_action('admin_post_wp_locator_register_client', $this->dcr, 'register');
         $this->loader->add_action('template_redirect', $this, 'validate_auth_code');
@@ -97,18 +99,6 @@ class WP_Locator_Plugin {
             'menu_icon' => 'dashicons-location',
             'show_in_rest' => true
         ]);
-
-    }
-
-    public function register_post_type_columns($columns)
-    {
-
-        unset($columns['date']);
-
-        $columns['updated_at'] = __('Date Updated', 'wp-locator-plugin');
-        $columns['created_at'] = __('Date Created', 'wp-locator-plugin');
-
-        return $columns;
 
     }
 

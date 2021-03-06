@@ -103,4 +103,34 @@ class WP_Locator_Plugin_Admin {
         }
     }
 
+    public function register_post_type_columns($columns)
+    {
+
+        unset($columns['date']);
+
+        $columns['api_id'] = __('API Id', 'wp-locator-plugin');
+        $columns['updated_at'] = __('Date Updated', 'wp-locator-plugin');
+        $columns['created_at'] = __('Date Created', 'wp-locator-plugin');
+
+        return $columns;
+
+    }
+
+    public function custom_location_columns($column, $post_id)
+    {
+
+        switch ($column){
+            case 'api_id':
+                echo get_post_meta($post_id, '_wp_locator_id', true);
+                break;
+            case 'updated_at':
+                echo date_create(get_post_meta($post_id, '_wp_locator_updated_at', true))->format('d-m-Y H:i:s');
+                break;
+            case 'created_at':
+                echo date_create(get_post_meta($post_id, '_wp_locator_created_at', true))->format('d-m-Y H:i:s');
+                break;
+        }
+
+    }
+
 }

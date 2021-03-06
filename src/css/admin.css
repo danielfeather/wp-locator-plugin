@@ -5,3 +5,23 @@
 #wpcontent {
     padding-left: 0;
 }
+
+/* Animations */
+@keyframes pingDiscrete {
+    0% {
+        opacity: 0.5;
+    }
+    70% {
+        opacity: 0;
+        transform: scale(1.6);
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.animate-ping-discrete {
+
+    animation: pingDiscrete 2s infinite;
+
+}

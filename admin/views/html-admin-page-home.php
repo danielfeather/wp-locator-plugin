@@ -15,9 +15,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 
     <div class="px-10 mb-8">
         <div class="bg-white p-4 flex">
-            <div class="mr-auto block">
-                <span class="text-red-500 font-bold text-lg block">Disconnected</span>
-                <small class="block text-xs">Last Sync: Never</small>
+            <div class="mr-auto block flex items-center">
+                <div class="relative h-6 w-6 mr-4">
+                    <span class="animate-ping-discrete absolute h-full w-full bg-green-500 opacity-75 rounded-full"></span>
+                    <span class="block rounded-full bg-green-500 h-full w-full"></span>
+                </div>
+                <div class="">
+                    <span class="text-green-500 font-bold text-lg block">Healthy</span>
+                    <small class="block text-xs">Last Sync: Never</small>
+                </div>
             </div>
             <a href="<?php echo $authorization_url ?>" class="button button-primary">Authorize</a>
         </div>
