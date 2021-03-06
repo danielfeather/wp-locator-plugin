@@ -38,7 +38,6 @@ class WP_Locator_Plugin {
         $this->load_dependancies();
 
         $this->loader->add_action('init', $this, 'register_post_type');
-        $this->loader->add_action('init', $this, 'add_auth_callback_rule');
 
         $this->loader->add_action('admin_menu', $this->admin, 'register_admin_menus');
         $this->loader->add_action('admin_init', $this->admin, 'register_settings');
@@ -46,10 +45,6 @@ class WP_Locator_Plugin {
         $this->loader->add_filter('manage_location_posts_columns', $this->admin, 'register_post_type_columns');
         $this->loader->add_action('admin_enqueue_scripts', $this->admin, 'load_scripts');
         $this->loader->add_action('manage_location_posts_custom_column', $this->admin, 'custom_location_columns', 10, 2);
-
-        $this->loader->add_action('template_redirect', $this, 'validate_auth_code');
-
-        $this->loader->add_filter('query_vars', $this, 'register_query_vars');
 
         $this->admin->register_meta();
 
@@ -106,19 +101,6 @@ class WP_Locator_Plugin {
             'menu_icon' => 'dashicons-location',
             'show_in_rest' => true
         ]);
-
-    }
-
-    public function register_query_vars($query_vars)
-    {
-        $query_vars[] = 'code';
-        return $query_vars;
-    }
-
-    public function add_auth_callback_rule()
-    {
-
-        add_rewrite_rule('^wp-locator/oauth2/callback', 'index.php', 'top');
 
     }
 
