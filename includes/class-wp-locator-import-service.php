@@ -94,7 +94,7 @@ class WP_Locator_Import_Service extends WP_Locator_Api_Client {
 
         foreach ($this->mapping as $meta_key => $name){
 
-            add_post_meta($id, $meta_key, $location_attributes[$name]);
+            update_post_meta($id, $meta_key, $location_attributes[$name]);
 
         }
 
