@@ -53,6 +53,8 @@ class WP_Locator_Plugin {
 
         $this->loader->add_action('admin_init', $this->admin, 'validate_auth_code');
 
+        $this->register_frontend();
+
         $this->register_cron_schedules();
         $this->register_cron_actions();
 
@@ -75,6 +77,8 @@ class WP_Locator_Plugin {
         require_once plugin_dir_path(__FILE__) . '/class-wp-locator-api-client.php';
 
         require_once plugin_dir_path(__FILE__) . '/class-wp-locator-import-service.php';
+
+        require_once plugin_dir_path(__FILE__) . '/class-wp-locator-template-loader.php';
 
         $this->loader = new WP_Locator_Plugin_Loader();
 
@@ -122,6 +126,25 @@ class WP_Locator_Plugin {
         ];
 
         return $schedules;
+    }
+
+    public function register_frontend()
+    {
+        $this->loader->add_filter('template_include', WP_Locator_Template_Loader::class, 'template_loader');
+        $this->loader->add_action('template_redirect', $this, 'enqueue_scripts');
+    }
+
+    public function enqueue_scripts()
+    {
+        if (is_singular('location') || is_post_type_archive('location')){
+            wp_enqueue_style('wp-locator-styles', WP_LOCATOR_PLUGIN_URL . 'public/assets/public.css');
+            wp_enqueue_script('wp-locator-script', WP_LOCATOR_PLUGIN_URL . 'public/assets/public.js', null, false, true);
+        }
+
+        if (is_singular('location') && $google_api_key = get_option(WP_LOCATOR_GOOGLE_MAPS_API_KEY)){
+            wp_enqueue_script('wp-locator-location-map', WP_LOCATOR_PLUGIN_URL . 'public/assets/location-map.js', null, false, true);
+            wp_enqueue_script('wp-locator-google-maps-sdk', "https://maps.googleapis.com/maps/api/js?key=$google_api_key&callback=wplocator.initMap", ['wp-locator-location-map'], false, true);
+        }
     }
 
 }

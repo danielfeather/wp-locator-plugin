@@ -3,11 +3,14 @@ import * as MiniCssExtractPlugin from "mini-css-extract-plugin";
 
 const config: Configuration = {
   entry: {
-    'admin/assets/admin': './src/admin.ts'
+    'admin/assets/admin': './src/admin.ts',
+    'public/assets/public': './src/public.ts',
+    'public/assets/location-map': './src/location-map.ts'
   },
   output: {
     filename: '[name].js',
     path: __dirname,
+    library: 'wplocator'
   },
   mode: process.env.NODE_ENV === 'dev' ? 'development' : 'production',
   module: {

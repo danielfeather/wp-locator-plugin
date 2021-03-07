@@ -10,6 +10,8 @@
  * License: MIT
  */
 
+define('WP_LOCATOR_PLUGIN_PATH', plugin_dir_path(__FILE__));
+define('WP_LOCATOR_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 define('WP_LOCATOR_API_BASE_URL', 'wp-locator-api-base-url');
 
@@ -19,6 +21,8 @@ define('WP_LOCATOR_OAUTH_DCR_ENDPOINT', 'wp-locator-oauth-dcr-endpoint');
 define('WP_LOCATOR_OAUTH_CLIENT_ID', 'wp-locator-oauth-client-id');
 define('WP_LOCATOR_OAUTH_CLIENT_SECRET', 'wp-locator-oauth-client-secret');
 define('WP_LOCATOR_OAUTH_REFRESH_TOKEN', 'wp-locator-oauth-refresh-token');
+
+define('WP_LOCATOR_GOOGLE_MAPS_API_KEY', 'wp-locator-google-maps-api-key');
 
 // The access token will be stored in a Wordpress Transient.
 define('WP_LOCATOR_OAUTH_ACCESS_TOKEN', 'wp-locator-oauth-access-token');
