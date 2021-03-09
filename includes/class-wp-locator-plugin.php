@@ -91,6 +91,16 @@ class WP_Locator_Plugin {
         $this->import_service = new WP_Locator_Import_Service();
     }
 
+    public function plugin_path()
+    {
+        return untrailingslashit(WP_LOCATOR_PLUGIN_PATH);
+    }
+
+    public function template_path()
+    {
+        return apply_filters('wp_locator_template_path', 'wp-locator/');
+    }
+
     public function register_post_type()
     {
 

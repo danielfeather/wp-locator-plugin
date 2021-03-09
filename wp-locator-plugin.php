@@ -39,8 +39,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$plugin = new WP_Locator_Plugin();
-$plugin->run();
+$wp_locator = new WP_Locator_Plugin();
+$wp_locator->run();
+
+require_once plugin_dir_path(__FILE__) . '/includes/wp-locator-core-functions.php';
 
 register_activation_hook(__FILE__, [$activator, 'activate']);
 register_deactivation_hook(__FILE__, [$deactivator, 'deactivate']);
